@@ -3,7 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const backendUrl = "http://localhost:5000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 axios.defaults.baseURL = backendUrl; //so axios always calls your backend
 
 export const AuthContext = createContext(); //hold auth-related data and functions

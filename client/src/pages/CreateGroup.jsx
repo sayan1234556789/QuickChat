@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
-import { ChatContext } from "../../context/chatContext";
-import { AuthContext } from "../../context/AuthContext";
+import { ChatContext } from "../context/chatContext";
+import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
