@@ -58,6 +58,9 @@ const Sidebar = () => {
     }
   };
 
+
+
+
   useEffect(() => {
     getUsers();
     getGroups();
@@ -205,6 +208,22 @@ const Sidebar = () => {
                 {unseenMessages[user._id]}
               </p>
             )}
+
+            {/* Cross Icon (appears only on hover) */}
+            <img
+              src={assets.cross_icon}
+              alt="close"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log("Exit/Delete user:",user._id );
+                // call API to exit/delete user
+
+              }}
+
+              className="absolute top-1 right-1 w-5 h-5 rounded-full 
+          opacity-0 group-hover:opacity-100 transition-opacity duration-200 
+          cursor-pointer bg-black/50 p-1"
+            />
           </div>
         ))}
       </div>
