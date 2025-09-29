@@ -10,6 +10,7 @@ export const ChatProvider = ({ children }) => {
   const [selectedChat, setSelectedChat] = useState(null);
   const [unseenMessages, setUnseenMessages] = useState({});
   const [groups, setGroups] = useState([]);
+  const [call, setCall] = useState(null)
 
   const { socket, axios, token, authUser } = useContext(AuthContext);
 
@@ -128,8 +129,28 @@ export const ChatProvider = ({ children }) => {
 
   const subscribeToMessages = () => {
     if (!socket) return;
+
     socket.on("newMessage", (msg) => handleIncomingMessage(msg, "user"));
     socket.on("newGroupMessage", (msg) => handleIncomingMessage(msg, "group"));
+
+    socket.on("incoming-call" , ({ from , offer}) => {
+      setCall({ type: "incoming", from, offer})
+    })
+
+    socket.on("call-accepted", ({ from, answer }) =>{
+      setCall({ type: "accepted", from, answer })
+    })
+
+    socket.on("ice-candidate", ({ from, candidate }) => {
+      document.dispatchEvent(
+        new CustomEvent("incoming-ice", { detail: { from, candidate }})
+      )
+    })
+
+    socket.on("call-ended", ({ from }) => {
+      setCall(null)
+      toast("Call ended")
+    })
   };
 
   const unsubscribeFromMessages = () => {
@@ -169,6 +190,8 @@ export const ChatProvider = ({ children }) => {
         setSelectedChat,
         unseenMessages,
         setUnseenMessages,
+        call,
+        setCall,
       }}
     >
       {children}

@@ -24,6 +24,7 @@ import img2 from './img2.jpg'
 import group_icon from './group_icon.png'
 import cross_icon from './cross_icon.png'
 import edit from './edit.png'
+import videoCall_icon from './videoCall_icon.png'
 
 const assets = {
     avatar_icon,
@@ -41,7 +42,8 @@ const assets = {
     bgImage,
     profile_martin,
     cross_icon,
-    edit
+    edit,
+    videoCall_icon
 }
 
 export default assets;

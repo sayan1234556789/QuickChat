@@ -6,9 +6,9 @@ import { AuthContext } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 const ChatContainer = () => {
-  const { messages, selectedChat, setSelectedChat, sendMessage, getMessages } =
+  const { messages, selectedChat, setSelectedChat, sendMessage, getMessages, setCall } =
     useContext(ChatContext);
-  const { authUser, onlineUsers } = useContext(AuthContext);
+  const { authUser, onlineUsers , socket } = useContext(AuthContext);
 
   const scrollEnd = useRef();
   const [input, setInput] = useState("");
@@ -48,6 +48,13 @@ const ChatContainer = () => {
     reader.readAsDataURL(file);
   };
 
+  const handleStartCall = (targetId) => {
+    if(!targetId) return
+    // socket.emit("call-user", { targetId , offer: null})
+    setCall({ type: "outgoing", targetId})
+    toast.success("Calling...")
+  }
+
   useEffect(() => {
     if (chatId) getMessages(chatId, selectedChat.type);
   }, [selectedChat]);
@@ -84,6 +91,13 @@ const ChatContainer = () => {
               <span className="w-2 h-2 rounded-full bg-green-500"></span>
             )}
         </p>
+
+        {selectedChat.type === "user" && (
+          <img src= {assets.videoCall_icon} alt="" className="w-6 h-6 cursor-pointer"
+            onClick={() => handleStartCall(selectedChat.data._id)}
+          />
+        )}
+
         <img
             src={assets.menu_icon}
             alt="menu"

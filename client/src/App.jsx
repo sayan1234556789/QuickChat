@@ -8,6 +8,7 @@ import ProfilePage from './pages/ProfilePage'
 import CreateGroup from './pages/CreateGroup'
 import { Toaster } from "react-hot-toast"
 import { AuthContext } from './context/AuthContext'
+import VideoCall from './components/VideoCall'
 
 const App = () => {
 
@@ -22,6 +23,7 @@ const App = () => {
     <Route path='/profile' element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
     <Route path="/create-group" element={!authUser ? <LoginPage /> : <CreateGroup />} />
   </Routes>
+  <VideoCall/>
 </div>
 
 
