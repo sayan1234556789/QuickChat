@@ -61,14 +61,9 @@ io.on("connection", (socket) => {
   io.on("connection" , (socket) =>{
     console.log("Video Call : User connected for signaling", socket.id)
 
-    //caller sends an offer to callee
-    // socket.on("call-user", ({ targetId, offer }) => {
-    //   console.log(`Call initiated from ${socket.id} to ${targetId}`)
-    //   io.to(targetId).emit("incoming-call", { from: socket.id, offer})
-    // })
-
+  
     socket.on("call-user", ({ targetId, offer }) => {
-    const targetSocketId = userSocketMap[targetId];   // 🔑 map userId → socketId
+    const targetSocketId = userSocketMap[targetId];   //map userId → socketId
     if (targetSocketId) {
       console.log(`Call initiated from ${socket.id} to user ${targetId}`);
       io.to(targetSocketId).emit("incoming-call", { from: socket.handshake.query.userId, offer });
@@ -76,11 +71,6 @@ io.on("connection", (socket) => {
   });
 
     //callee accepts and sends an answer
-    // socket.on("answer-call", ({ targetId, answer }) => {
-    //   console.log(`Call answered by ${socket.id} to ${targetId}`)
-    //   io.to(targetId).emit("call-accepted", { from: socket.id , answer})
-    // })
-
     socket.on("answer-call", ({ targetId, answer }) => {
     const targetSocketId = userSocketMap[targetId];
     if (targetSocketId) {
@@ -90,11 +80,6 @@ io.on("connection", (socket) => {
   });
 
     //Exchange ICE candidates between peers
-    // socket.on("ice-candidate", ({ targetId, candidate }) => {
-    //   console.log(`ICE candidate form ${socket.id} to ${targetId}`)
-    //   io.to(targetId).emit("ice-candidate", { from: socket.id, candidate})
-    // })
-
     socket.on("ice-candidate", ({ targetId, candidate }) => {
     const targetSocketId = userSocketMap[targetId];
     if (targetSocketId) {
@@ -104,11 +89,6 @@ io.on("connection", (socket) => {
 
 
     //end call
-    // socket.on("end-call", ({ targetId }) => {
-    //   console.log(`Call ended between ${socket.id} and ${targetId}`)
-    //   io.to(targetId).emit("call-ended", { from: socket.id})
-    // })
-
     socket.on("end-call", ({ targetId }) => {
     const targetSocketId = userSocketMap[targetId];
     if (targetSocketId) {

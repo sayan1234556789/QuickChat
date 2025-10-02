@@ -1,10 +1,11 @@
+
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { ChatContext } from "../context/ChatContext";
 import toast from "react-hot-toast";
 
 const VideoCall = () => {
-  const { socket, authUser } = useContext(AuthContext);
+  const { socket } = useContext(AuthContext);
   const { call, setCall } = useContext(ChatContext);
 
   const localVideoRef = useRef(null);
@@ -13,6 +14,7 @@ const VideoCall = () => {
   const localStreamRef = useRef(null);
 
   const [isInCall, setIsInCall] = useState(false);
+  const queuedCandidatesRef = useRef([]); // buffer for ICE candidates
 
   // Start local media
   const startLocalStream = async () => {
@@ -33,18 +35,17 @@ const VideoCall = () => {
   };
 
   // Create peer connection
-  const createPeerConnection = () => {
+  const createPeerConnection = (remoteId) => {
     const pc = new RTCPeerConnection({
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },  //stun google free
-      ]
-
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
 
     // Local tracks
-    localStreamRef.current.getTracks().forEach((track) => {
-      pc.addTrack(track, localStreamRef.current);
-    });
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => {
+        pc.addTrack(track, localStreamRef.current);
+      });
+    }
 
     // Remote tracks
     pc.ontrack = (event) => {
@@ -55,9 +56,9 @@ const VideoCall = () => {
 
     // ICE candidate
     pc.onicecandidate = (event) => {
-      if (event.candidate && call?.targetId) {
+      if (event.candidate && remoteId) {
         socket.emit("ice-candidate", {
-          targetId: call.targetId || call.from,
+          targetId: remoteId,
           candidate: event.candidate,
         });
       }
@@ -66,11 +67,30 @@ const VideoCall = () => {
     return pc;
   };
 
+  // Flush queued ICE candidates after remoteDescription is set
+  const flushQueuedCandidates = async () => {
+    if (
+      peerConnectionRef.current &&
+      peerConnectionRef.current.remoteDescription
+    ) {
+      for (const candidate of queuedCandidatesRef.current) {
+        try {
+          await peerConnectionRef.current.addIceCandidate(
+            new RTCIceCandidate(candidate)
+          );
+        } catch (err) {
+          console.error("Error adding queued ICE candidate", err);
+        }
+      }
+      queuedCandidatesRef.current = [];
+    }
+  };
+
   // Handle outgoing call
   const startCall = async () => {
     if (!call?.targetId) return;
     await startLocalStream();
-    peerConnectionRef.current = createPeerConnection();
+    peerConnectionRef.current = createPeerConnection(call.targetId);
 
     const offer = await peerConnectionRef.current.createOffer();
     await peerConnectionRef.current.setLocalDescription(offer);
@@ -82,16 +102,16 @@ const VideoCall = () => {
   // Handle incoming call (accept)
   const acceptCall = async () => {
     await startLocalStream();
-    peerConnectionRef.current = createPeerConnection();
+    peerConnectionRef.current = createPeerConnection(call.from);
 
-    await peerConnectionRef.current.setRemoteDescription(
-      new RTCSessionDescription(call.offer)
-    );
+    await peerConnectionRef.current.setRemoteDescription(call.offer);
     const answer = await peerConnectionRef.current.createAnswer();
     await peerConnectionRef.current.setLocalDescription(answer);
 
     socket.emit("answer-call", { targetId: call.from, answer });
     setIsInCall(true);
+
+    await flushQueuedCandidates(); // process queued ICE
   };
 
   // Decline call
@@ -110,6 +130,9 @@ const VideoCall = () => {
       localStreamRef.current.getTracks().forEach((t) => t.stop());
       localStreamRef.current = null;
     }
+    if (localVideoRef.current) localVideoRef.current.srcObject = null;
+    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+    queuedCandidatesRef.current = [];
     setCall(null);
     setIsInCall(false);
   };
@@ -124,19 +147,25 @@ const VideoCall = () => {
 
     socket.on("call-accepted", async ({ answer }) => {
       if (peerConnectionRef.current) {
-        await peerConnectionRef.current.setRemoteDescription(
-          new RTCSessionDescription(answer)
-        );
+        await peerConnectionRef.current.setRemoteDescription(answer);
+        await flushQueuedCandidates();
       }
     });
 
     socket.on("ice-candidate", async ({ candidate }) => {
-      try {
-        await peerConnectionRef.current?.addIceCandidate(
-          new RTCIceCandidate(candidate)
-        );
-      } catch (err) {
-        console.error("Error adding ICE candidate", err);
+      if (
+        peerConnectionRef.current &&
+        peerConnectionRef.current.remoteDescription
+      ) {
+        try {
+          await peerConnectionRef.current.addIceCandidate(
+            new RTCIceCandidate(candidate)
+          );
+        } catch (err) {
+          console.error("Error adding ICE candidate", err);
+        }
+      } else {
+        queuedCandidatesRef.current.push(candidate); // queue if not ready
       }
     });
 
@@ -158,7 +187,8 @@ const VideoCall = () => {
     if (call?.type === "outgoing") {
       startCall();
     }
-  }, [call]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [call?.type]);
 
   if (!call) return null;
 
