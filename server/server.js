@@ -13,38 +13,38 @@ import groupRouter from "./routes/groupRoute.js"
 const app = express()
 const server = http.createServer(app)
 
-//Initialize socket.io server instance (io) attached to your HTTP server.
+
 export const io = new Server(server, {
-    cors: { origin: "*"} //allows any client (frontend) from any domain to connect.
+    cors: { origin: "*"}
 })
 
-//store online users 
-export const userSocketMap = {}  //{userId : socketId}
 
-//socket.io connection handler
-io.on("connection", (socket) => {   //Runs whenever a new client (browser/app) connects.
-    const userId = socket.handshake.query.userId //gets the userId that frontend sends while connecting.
+export const userSocketMap = {}  
+
+
+io.on("connection", (socket) => {   
+    const userId = socket.handshake.query.userId 
     console.log("User Connected", userId)
 
-    if(userId) userSocketMap[userId] = socket.id;  //Stores the mapping of {userId : socketId}
+    if(userId) userSocketMap[userId] = socket.id; 
 
-    //Emit online users to all connected clients
+    
     io.emit("getOnlineUsers", Object.keys(userSocketMap))
 
-    // When a user disconnects
+   
     socket.on("disconnect", ()=> {
         console.log("User Disconnected", userId)
         delete userSocketMap[userId]
-        io.emit("getOnlineUsers", Object.keys(userSocketMap)) //Broadcasts updated list of online users to everyone.
+        io.emit("getOnlineUsers", Object.keys(userSocketMap)) 
     })
 })
 
 
-//socket.io group connection handler
+
 io.on("connection", (socket) => {
   console.log("User Connected ", socket.id)
 
-  //join group room
+ 
   socket.on("joinGroup", (groupId) => {
     socket.join(groupId)
     console.log(`User joined group: ${groupId}`)
@@ -57,20 +57,20 @@ io.on("connection", (socket) => {
 
 })
 
-//video call signaling
+
   io.on("connection" , (socket) =>{
     console.log("Video Call : User connected for signaling", socket.id)
 
   
     socket.on("call-user", ({ targetId, offer }) => {
-    const targetSocketId = userSocketMap[targetId];   //map userId → socketId
+    const targetSocketId = userSocketMap[targetId];  
     if (targetSocketId) {
       console.log(`Call initiated from ${socket.id} to user ${targetId}`);
       io.to(targetSocketId).emit("incoming-call", { from: socket.handshake.query.userId, offer });
     }
   });
 
-    //callee accepts and sends an answer
+    
     socket.on("answer-call", ({ targetId, answer }) => {
     const targetSocketId = userSocketMap[targetId];
     if (targetSocketId) {
@@ -79,7 +79,7 @@ io.on("connection", (socket) => {
     }
   });
 
-    //Exchange ICE candidates between peers
+    
     socket.on("ice-candidate", ({ targetId, candidate }) => {
     const targetSocketId = userSocketMap[targetId];
     if (targetSocketId) {
@@ -88,7 +88,7 @@ io.on("connection", (socket) => {
   });
 
 
-    //end call
+  
     socket.on("end-call", ({ targetId }) => {
     const targetSocketId = userSocketMap[targetId];
     if (targetSocketId) {
@@ -99,17 +99,17 @@ io.on("connection", (socket) => {
   })
 
 
-// middlewares
+
 app.use(express.json({ limit: "4mb" }))
 app.use(cors())
 
-// routes
+
 app.use("/api/status", (req, res) => res.send("Server is live"))
 app.use("/api/auth", userRouter)
 app.use("/api/messages", messageRouter)
 app.use("/api/groups", groupRouter)
 
-// main function to connect DB and start server
+
 const startServer = async () => {
   try {
     await connectDB()

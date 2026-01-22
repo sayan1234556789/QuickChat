@@ -72,12 +72,12 @@ const Sidebar = () => {
         selectedChat ? "max-md:hidden" : ""
       }`}
     >
-      {/* Top section with logo + menu */}
+      
       <div className="pb-5">
         <div className="flex justify-between items-center">
           <img src={assets.logo} alt="logo" className="max-w-40" />
 
-          {/* Hover Dropdown */}
+       
           <div className="relative py-2 group">
             <img
               src={assets.menu_icon}
@@ -85,7 +85,7 @@ const Sidebar = () => {
               className="max-h-5 cursor-pointer"
             />
 
-            {/* Dropdown menu */}
+           
             <div className="absolute top-full right-0 z-20 w-32 p-3 rounded-md bg-[#282142] border border-gray-600 text-gray-100 hidden group-hover:block">
               <p
                 onClick={() => navigate("/profile")}
@@ -104,7 +104,7 @@ const Sidebar = () => {
           </div>
         </div>
 
-        {/* Search bar */}
+       
         <div className="bg-[#282142] rounded-full flex items-center gap-2 py-3 px-4 mt-5">
           <img src={assets.search_icon} alt="search" className="w-3" />
           <input
@@ -116,20 +116,20 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* Groups Section */}
+      
       <div className="flex flex-col mt-4">
-        {/* Header with + New */}
+     
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-gray-400 text-sm">Groups</h3>
           <button
             onClick={() => navigate("/create-group")}
-            className="text-lg text-violet-400 hover:underline"
+            className="text-lg text-violet-400 hover:underline cursor-pointer"
           >
             + New
           </button>
         </div>
 
-        {/* Group List */}
+        
         {groups.map((group) => (
           <div
             key={group._id}
@@ -141,22 +141,22 @@ const Sidebar = () => {
                 : ""
             }`}
           >
-            {/* Group Icon */}
+          
             <img
               src={group.profilePic || assets.group_icon}
               alt="group"
               className="w-[35px] rounded-full"
             />
 
-            {/* Group Name */}
+           
             <p>{group.name}</p>
 
-            {/* Cross Icon (only on hover) */}
+            
             <img
               src={assets.cross_icon}
               alt="close"
               onClick={(e) => {
-                e.stopPropagation(); //prevent selecting the group
+                e.stopPropagation(); 
                 handleDeleteGroup(group._id, group.name)
 
               }}
@@ -168,7 +168,7 @@ const Sidebar = () => {
         ))}
       </div>
 
-      {/* Users Section */}
+      
       <div className="flex flex-col mt-4">
         <h3 className="text-gray-400 text-sm mb-2">Users</h3>
         {filteredUsers.map((user) => (
@@ -185,14 +185,14 @@ const Sidebar = () => {
                 : ""
             }`}
           >
-            {/* Profile Pic */}
+            
             <img
               src={user?.profilePic || assets.avatar_icon}
               alt="profile pic"
               className="w-[35px] aspect-square rounded-full"
             />
 
-            {/* User Info */}
+            
             <div className="flex flex-col leading-4">
               <p>{user.fullName}</p>
               {onlineUsers.includes(user._id) ? (
@@ -202,21 +202,20 @@ const Sidebar = () => {
               )}
             </div>
 
-            {/* Unseen Messages Badge */}
             {unseenMessages[user._id] > 0 && (
               <p className="absolute top-2 right-2 text-xs h-5 w-5 flex justify-center items-center rounded-full bg-violet-500/50">
                 {unseenMessages[user._id]}
               </p>
             )}
 
-            {/* Cross Icon (appears only on hover) */}
+           
             <img
               src={assets.cross_icon}
               alt="close"
               onClick={(e) => {
                 e.stopPropagation();
                 console.log("Exit/Delete user:",user._id );
-                // call API to exit/delete user
+               
 
               }}
 

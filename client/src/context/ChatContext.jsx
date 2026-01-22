@@ -18,8 +18,8 @@ export const ChatProvider = ({ children }) => {
   const normalizeMessage = (msg, type) => {
     const senderId =
       msg.senderId ||
-      (msg.sender && (msg.sender._id || msg.sender.id)) || // handle nested sender object
-      msg.userId || // in case backend uses userId
+      (msg.sender && (msg.sender._id || msg.sender.id)) || 
+      msg.userId || 
       "unknown_sender";
 
     return {
@@ -36,7 +36,7 @@ export const ChatProvider = ({ children }) => {
     };
   };
 
-  // Fetch users
+ 
   const getUsers = async () => {
     try {
       const { data } = await axios.get("/api/messages/users");
@@ -49,7 +49,7 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // Fetch messages
+
   const getMessages = async (chatId, type) => {
     try {
       if (!chatId) return;
@@ -69,7 +69,7 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // Send message
+
   const sendMessage = async (messageData) => {
     if (!messageData?.receiverId) return;
     try {
@@ -85,7 +85,7 @@ export const ChatProvider = ({ children }) => {
         const key = messageData.receiverId;
         const normalized = {
           ...normalizeMessage(data.newMessage, messageData.type),
-          senderId: authUser._id, //  ensure your own ID is set
+          senderId: authUser._id, 
         };
         setMessages((prev) => ({
           ...prev,
@@ -99,7 +99,7 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // Handle incoming socket messages
+  
   const handleIncomingMessage = (msg, type) => {
     if (!msg) return;
 
@@ -107,18 +107,18 @@ export const ChatProvider = ({ children }) => {
     const key = type === "group" ? normalized.groupId : normalized.senderId;
     if (!key) return;
 
-    // Append message
+   
     setMessages((prev) => ({
       ...prev,
       [key]: prev[key] ? [...prev[key], normalized] : [normalized],
     }));
 
-    // Mark as read for user messages
+    
     if (type === "user" && normalized._id) {
       axios.put(`/api/messages/mark/${normalized._id}`).catch(() => {});
     }
 
-    // Update unseen
+    
     if (!selectedChat || selectedChat.data?._id !== key) {
       setUnseenMessages((prev) => ({
         ...prev,

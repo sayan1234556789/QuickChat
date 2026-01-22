@@ -37,7 +37,7 @@ const LoginPage = () => {
         alt="logo"
       />
 
-      {/* Right side (form) */}
+     
       <form
         onSubmit={onSubmitHandler}
         className="w-full max-w-md border border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-xl bg-black/40 backdrop-blur-lg text-white"

@@ -22,7 +22,7 @@ const RightSidebar = () => {
     .filter((msg) => msg.image)
     .map((msg) => msg.image);
 
-  // Fetch group members
+    
   useEffect(() => {
     if (selectedChat.type === "group" && token) {
       const fetchMembers = async () => {
@@ -44,7 +44,7 @@ const RightSidebar = () => {
     }
   }, [selectedChat, token]);
 
-  // Exit group
+ 
   const handleExitGroup = async () => {
     try {
       const { data } = await axios.put(
@@ -66,7 +66,7 @@ const RightSidebar = () => {
     }
   };
 
-  // Update group
+  
   const handleUpdateGroup = async () => {
     try {
       const formData = {};
@@ -105,7 +105,7 @@ const RightSidebar = () => {
 
   return (
     <div className="bg-[#8185B2]/10 text-white min-w-[280px] h-full flex flex-col overflow-y-auto relative p-4">
-      {/* User / Group Info */}
+     
       <div className="flex flex-col items-center gap-2 mb-4">
         <img
           src={selectedChat.data.profilePic || assets.avatar_icon}
@@ -132,7 +132,7 @@ const RightSidebar = () => {
         <p className="text-sm text-center">{selectedChat.data.bio}</p>
       </div>
 
-      {/* Edit modal */}
+     
       {isEditing && (
         <div className="bg-[#1e1e2f] p-4 rounded-lg shadow-lg absolute top-20 left-1/2 -translate-x-1/2 w-72 z-50">
           <h2 className="text-lg font-medium mb-2 font-sans">Edit Group</h2>
@@ -175,7 +175,7 @@ const RightSidebar = () => {
 
       <hr className="border-[#ffffff50] my-4 w-full" />
 
-      {/* Media Section */}
+     
       <div className="text-xs mb-4">
         <p className="mb-2">Media</p>
         <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
@@ -192,7 +192,7 @@ const RightSidebar = () => {
         </div>
       </div>
 
-      {/* Members Section */}
+    
       {selectedChat.type === "group" && (
         <div className="text-xs mb-4">
           <p className="mb-2 font-medium">Members ({members.length})</p>
@@ -212,7 +212,7 @@ const RightSidebar = () => {
         </div>
       )}
 
-      {/* Exit group button */}
+    
       {selectedChat.type === "group" && (
         <button
           onClick={handleExitGroup}
@@ -222,10 +222,10 @@ const RightSidebar = () => {
         </button>
       )}
 
-      {/* Logout Button */}
+    
       <button
         onClick={() => logout()}
-        className="bg-gradient-to-r from-purple-400 to-violet-600 text-white text-sm font-light py-2 px-6 rounded-full w-full mt-auto"
+        className="bg-gradient-to-r from-purple-400 to-violet-600 text-white text-sm font-light py-2 px-6 rounded-full w-full mt-auto cursor-pointer"
       >
         Logout
       </button>

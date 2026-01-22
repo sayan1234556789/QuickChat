@@ -8,26 +8,22 @@ export const signup = async (req, res) =>{
     const {fullName, email, password, bio} = req.body
 
     try {
-        //if none of the item is available
+        
         if(!fullName || !email || !password || !bio) {
             return res.json({success: false, message: "Missing Details"})
         }
-        //else find the email of the user is available or not
+        
 
         const user = await User.findOne({email})
 
-        if(user){ //if user is available
+        if(user){ 
            return res.json({success: false, message: "Account already exists"}) 
         }
 
-        //Generates a random cryptographic salt.
-        /*A salt is extra random data added to the password before hashing, making each hash unique even if two users have the same password.
-        The number 10 is the cost factor (also called rounds).
-        Higher number = more secure but slower hashing.
-        10 is a good balance for most apps.*/
+       
 
         const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt) //Takes the user’s password + the generated salt, then runs it through bcrypt’s hashing algorithm.
+        const hashedPassword = await bcrypt.hash(password, salt) 
 
         const newUser = await User.create({
             fullName, email, password: hashedPassword, bio
@@ -43,7 +39,7 @@ export const signup = async (req, res) =>{
     }
 }
 
-//Controller to login  a user
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -74,19 +70,19 @@ export const login = async (req, res) => {
 };
 
 
-//controller to check if user is authenticated
+
 export const checkAuth = (req, res) => {
-    res.json({success: true, user: req.user}) //return the user data when user is authenticated
+    res.json({success: true, user: req.user}) 
 }
 
-//controller to update user profile details
+
 export const updateProfile = async (req, res) => {
   try {
     const { profilePic, bio, fullName } = req.body;
     const userId = req.user._id;
 
     console.log("Incoming update request:", {
-      hasProfilePic: !!profilePic,           //The !! is a double NOT operator that converts a value into a strict boolean (true or false).
+      hasProfilePic: !!profilePic,         
       bio,
       fullName,
     });
@@ -94,7 +90,7 @@ export const updateProfile = async (req, res) => {
     let updatedUser;
 
     if (!profilePic) {
-      // Update bio and name only
+      
       updatedUser = await User.findByIdAndUpdate(
         userId,
         { bio, fullName },
@@ -104,7 +100,7 @@ export const updateProfile = async (req, res) => {
       try {
         console.log("Uploading image to Cloudinary...");
         const upload = await cloudinary.uploader.upload(profilePic, {
-          folder: "user_profiles", // optional
+          folder: "user_profiles",
           resource_type: "auto", 
         });
         console.log("Cloudinary upload success:", upload.secure_url);

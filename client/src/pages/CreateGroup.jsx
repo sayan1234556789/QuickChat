@@ -64,7 +64,7 @@ const CreateGroup = () => {
           Create New Group
         </h2>
 
-        {/* Group Name */}
+       
         <input
           type="text"
           placeholder="Group Name"
@@ -73,7 +73,7 @@ const CreateGroup = () => {
           className="w-full mb-4 p-2 rounded-md bg-[#3A3A4E] outline-none border border-gray-600"
         />
 
-        {/* Members List */}
+     
         <div className="max-h-60 overflow-y-auto mb-4">
           {users.map((user) => (
             <label
@@ -95,7 +95,7 @@ const CreateGroup = () => {
           ))}
         </div>
 
-        {/* Submit */}
+     
         <button
           type="submit"
           className="w-full bg-violet-600 hover:bg-violet-700 transition text-white py-2 rounded-lg"

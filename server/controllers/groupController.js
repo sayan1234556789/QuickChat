@@ -1,21 +1,20 @@
-import Group from "../models/group.js";   // make sure filename matches
+import Group from "../models/group.js";   
 import { io } from "../server.js";
 import Message from "../models/message.js";
 import cloudinary from "../lib/cloudinary.js";
 import messageRouter from "../routes/messageRoutes.js";
 
 
-// Create a new group
 export const createGroup = async (req, res) => {
   try {
     const { name, members } = req.body;
-    const adminId = req.user?._id;  // logged-in user is admin
+    const adminId = req.user?._id; 
 
     if (!name || !members || members.length === 0) {
       return res.json({ success: false, message: "Missing group details" });
     }
 
-    // add creator as member too (if not already in list)
+    
     if (!members.includes(adminId.toString())) {
       members.push(adminId);
     }
@@ -23,7 +22,7 @@ export const createGroup = async (req, res) => {
     const group = await Group.create({
       name,
       members,
-      admin: adminId,   //  set admin here
+      admin: adminId,   
     });
 
     res.json({ success: true, group });
@@ -35,7 +34,7 @@ export const createGroup = async (req, res) => {
 
 
 
-// Get groups that logged-in user belongs to
+
 export const getMyGroups = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -51,7 +50,6 @@ export const getMyGroups = async (req, res) => {
 };
 
 
-// Send a message in group
 export const sendGroupMessage = async (req, res) => {
   try {
     const { text, image } = req.body;
@@ -100,7 +98,7 @@ export const sendGroupMessage = async (req, res) => {
 
 
 
-// Get all messages of a group
+
 export const getGroupMessages = async (req, res) => {
   try {
     const { id: groupId } = req.params;
@@ -120,7 +118,7 @@ export const getGroupMessages = async (req, res) => {
 };
 
 
-// Exit group (remove self from the group)
+
 export const exitGroup = async (req, res) => {
   try {
     const { id: groupId } = req.params;
@@ -144,7 +142,7 @@ export const exitGroup = async (req, res) => {
 };
 
 
-// Delete the group (admin only)
+
 export const deleteGroup = async (req, res) => {
   try {
     const { id: groupId } = req.params;
@@ -159,7 +157,7 @@ export const deleteGroup = async (req, res) => {
       return res.json({ success: false, message: "Group admin not set" })
     }
 
-    // only admin can delete
+   
     if (group.admin.toString() !== userId.toString()) {
       return res.json({ success: false, message: "Not authorized" });
     }
@@ -173,7 +171,7 @@ export const deleteGroup = async (req, res) => {
 };
 
 
-// Update group info (name, pic)
+
 export const updateGroup = async (req, res) => {
   try {
     const { id: groupId } = req.params;
@@ -209,7 +207,7 @@ export const updateGroup = async (req, res) => {
 };
 
 
-// Get group members
+
 export const getGroupMembers = async (req, res) => {
   try {
     const { id: groupId } = req.params;

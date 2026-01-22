@@ -16,7 +16,7 @@ const VideoCall = () => {
   const [isInCall, setIsInCall] = useState(false);
   const queuedCandidatesRef = useRef([]); // buffer for ICE candidates
 
-  // Start local media
+ 
   const startLocalStream = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -34,27 +34,26 @@ const VideoCall = () => {
     }
   };
 
-  // Create peer connection
+
   const createPeerConnection = (remoteId) => {
     const pc = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
 
-    // Local tracks
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((track) => {
         pc.addTrack(track, localStreamRef.current);
       });
     }
 
-    // Remote tracks
+
     pc.ontrack = (event) => {
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = event.streams[0];
       }
     };
 
-    // ICE candidate
+
     pc.onicecandidate = (event) => {
       if (event.candidate && remoteId) {
         socket.emit("ice-candidate", {
@@ -67,7 +66,7 @@ const VideoCall = () => {
     return pc;
   };
 
-  // Flush queued ICE candidates after remoteDescription is set
+
   const flushQueuedCandidates = async () => {
     if (
       peerConnectionRef.current &&
@@ -86,7 +85,7 @@ const VideoCall = () => {
     }
   };
 
-  // Handle outgoing call
+ 
   const startCall = async () => {
     if (!call?.targetId) return;
     await startLocalStream();
@@ -99,7 +98,7 @@ const VideoCall = () => {
     setIsInCall(true);
   };
 
-  // Handle incoming call (accept)
+ 
   const acceptCall = async () => {
     await startLocalStream();
     peerConnectionRef.current = createPeerConnection(call.from);
@@ -111,16 +110,16 @@ const VideoCall = () => {
     socket.emit("answer-call", { targetId: call.from, answer });
     setIsInCall(true);
 
-    await flushQueuedCandidates(); // process queued ICE
+    await flushQueuedCandidates(); 
   };
 
-  // Decline call
+ 
   const declineCall = () => {
     socket.emit("end-call", { targetId: call.from });
     endCall();
   };
 
-  // End call (cleanup)
+  
   const endCall = () => {
     if (peerConnectionRef.current) {
       peerConnectionRef.current.close();
@@ -137,7 +136,7 @@ const VideoCall = () => {
     setIsInCall(false);
   };
 
-  // Handle signaling events
+  
   useEffect(() => {
     if (!socket) return;
 
@@ -165,7 +164,7 @@ const VideoCall = () => {
           console.error("Error adding ICE candidate", err);
         }
       } else {
-        queuedCandidatesRef.current.push(candidate); // queue if not ready
+        queuedCandidatesRef.current.push(candidate); 
       }
     });
 
@@ -182,12 +181,12 @@ const VideoCall = () => {
     };
   }, [socket, call]);
 
-  // Auto-start outgoing call
+  
   useEffect(() => {
     if (call?.type === "outgoing") {
       startCall();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [call?.type]);
 
   if (!call) return null;

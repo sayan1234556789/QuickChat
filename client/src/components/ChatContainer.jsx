@@ -75,7 +75,7 @@ const ChatContainer = () => {
 
   return (
     <div className="h-full overflow-y-scroll relative backdrop-blur-lg">
-      {/* Header */}
+     
       <div className="flex items-center gap-3 py-3 mx-4 border-b border-stone-500">
         <img
           src={selectedChat.data.profilePic || assets.avatar_icon}
@@ -108,7 +108,7 @@ const ChatContainer = () => {
 
 
 
-      {/* Messages */}
+    
       <div className="flex flex-col h-[calc(100%-120px)] overflow-y-scroll p-3 pb-6">
         {chatMessages.map((msg, index) => {
           if (!msg) return null;
@@ -168,7 +168,7 @@ const ChatContainer = () => {
         <div ref={scrollEnd}></div>
       </div>
 
-      {/* Input */}
+     
       <form
         onSubmit={handleSendMessage}
         className="absolute bottom-0 left-0 right-0 flex items-center gap-3 p-3"
