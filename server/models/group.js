@@ -1,10 +1,22 @@
 import mongoose from "mongoose";
 
 const groupSchema = new mongoose.Schema({
-  name: { type: String, required: true },
- members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  admin: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, 
-  profilePic: { type: String, default: "" },
+  name: { 
+    type: String, 
+    required: true 
+  },
+ members: [{ 
+  type: mongoose.Schema.Types.ObjectId, 
+  ref: "User" 
+}],
+  admin: { type: mongoose.Schema.Types.ObjectId,
+     ref: "User", 
+     required: true
+    }, 
+  profilePic: { 
+    type: String,
+    default: "" 
+  },
   messages: [
     {
       sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

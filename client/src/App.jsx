@@ -1,4 +1,3 @@
-//creating the routes to open the page with given url
 
 import React, { useContext } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'

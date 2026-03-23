@@ -26,12 +26,20 @@ export const signup = async (req, res) =>{
         const hashedPassword = await bcrypt.hash(password, salt) 
 
         const newUser = await User.create({
-            fullName, email, password: hashedPassword, bio
+            fullName,
+            email, 
+            password: hashedPassword, 
+            bio
         })
 
         const token = generateToken(newUser._id)
 
-        res.json({success: true, userData: newUser, token, message: "Account created successfully"})
+        res.json({
+          success: true, 
+          userData: newUser, 
+          token, 
+          message: "Account created successfully"
+        })
 
     } catch (error) {
         console.log(error.message)
@@ -96,7 +104,8 @@ export const updateProfile = async (req, res) => {
         { bio, fullName },
         { new: true }
       );
-    } else {
+    } 
+    else {
       try {
         console.log("Uploading image to Cloudinary...");
         const upload = await cloudinary.uploader.upload(profilePic, {
